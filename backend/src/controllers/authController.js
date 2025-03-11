@@ -1,37 +1,41 @@
 import { pool } from "../libs/database.js";
-import { comparePassword, createJWT, hashPassword } from "../libs/index.js";
+import { createJWT } from "../libs/index.js";
+import { body, validationResult } from 'express-validator';
 
 export const signupUser = async (req, res) => {
   try {
-    const { firstName, email, password } = req.body;
-
-    if (!(firstName && email && password)) {
+    // Input validation using express-validator
+    await body('firebaseUID').notEmpty().run(req);
+    await body('email').isEmail().run(req);
+    await body('name').notEmpty().run(req);
+    await body('provider').notEmpty().run(req);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({
-        status: "failed",
-        message: "Provide Required Fields!",
+        status: 'failed',
+        message: 'Validation errors',
+        errors: errors.array(),
       });
     }
 
+    const { firebaseUID, email, name, provider } = req.body;
+
     const userExist = await pool.query({
-      text: "SELECT EXISTS (SELECT * FROM tbluser WHERE email = $1)",
+      text: "SELECT 1 FROM Identity.User WHERE email = $1 LIMIT 1",
       values: [email],
     });
 
-    if (userExist.rows[0].exists) {
+    if (userExist.rows.length > 0) {
       return res.status(409).json({
         status: "failed",
         message: "Email Address already exists. Try Login",
       });
     }
 
-    const hashedPassword = await hashPassword(password);
-
     const user = await pool.query({
-      text: `INSERT INTO tbluser (firstname, email, password) VALUES ($1, $2, $3) RETURNING *`,
-      values: [firstName, email, hashedPassword],
+      text: `INSERT INTO Identity.User (firebaseUID, email, name, provider) VALUES ($1, $2, $3, $4) RETURNING firebaseUID, email, name, provider`,
+      values: [firebaseUID, email, name, provider],
     });
-
-    user.rows[0].password = undefined;
 
     res.status(201).json({
       status: "success",
@@ -43,6 +47,7 @@ export const signupUser = async (req, res) => {
     res.status(500).json({ status: "failed", message: "Internal Server Error" });
   }
 };
+
 
 export const signinUser = async (req, res) => {
   try {
