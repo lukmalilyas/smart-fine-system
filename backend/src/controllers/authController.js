@@ -51,44 +51,42 @@ export const signupUser = async (req, res) => {
 
 export const signinUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    if (!(email && password)) {
+    // Input validation using express-validator
+    await body('email').isEmail().run(req);
+    await body('firebaseUID').notEmpty().run(req); // You need firebaseUID to identify the user.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({
-        status: "failed",
-        message: "Provide Required Fields!",
+        status: 'failed',
+        message: 'Validation errors',
+        errors: errors.array(),
       });
     }
 
-    const result = await pool.query({
-      text: `SELECT * FROM tbluser WHERE email = $1`,
+    const { firebaseUID, email } = req.body;
+
+    // Check if the user exists in the database by email
+    const userExist = await pool.query({
+      text: "SELECT * FROM Identity.User WHERE email = $1 LIMIT 1",
       values: [email],
     });
 
-    const user = result?.rows?.[0];
+    const user = userExist?.rows?.[0];
 
-    if (!user) {
+    if (!user || user.firebaseUID !== firebaseUID) {
       return res.status(401).json({
         status: "failed",
-        message: "Invalid email or password.",
+        message: "Invalid email or firebaseUID.",
       });
     }
 
-    const isMatch = await comparePassword(password, user.password);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        status: "failed",
-        message: "Invalid email or password",
-      });
-    }
-
-    const token = createJWT(user.id);
+    // Generate JWT
+    const token = createJWT(user.ID);  // Ensure `user.ID` is available from the query result.
 
     res.status(200).json({
       status: "success",
       message: "Login successful",
-      user: user, // Include user info directly
+      user: user,  // Return user information (standardized return value).
       token,
     });
   } catch (error) {
