@@ -21,7 +21,7 @@ export const signupUser = async (req, res) => {
     const { firebaseUID, email, name, provider } = req.body;
 
     const userExist = await pool.query({
-      text: "SELECT 1 FROM Identity.User WHERE email = $1 LIMIT 1",
+      text: 'SELECT 1 FROM "Identity"."Users" WHERE "Email" = $1 LIMIT 1',
       values: [email],
     });
 
@@ -33,9 +33,12 @@ export const signupUser = async (req, res) => {
     }
 
     const user = await pool.query({
-      text: `INSERT INTO Identity.User (firebaseUID, email, name, provider) VALUES ($1, $2, $3, $4) RETURNING firebaseUID, email, name, provider`,
+      text: `INSERT INTO "Identity"."Users" ("FirebaseUID", "Email", "Name", "Provider") 
+             VALUES ($1, $2, $3, $4) 
+             RETURNING "Email", "Name", "Provider"`, // Make sure column names match
       values: [firebaseUID, email, name, provider],
     });
+    
 
     res.status(201).json({
       status: "success",
@@ -67,21 +70,23 @@ export const signinUser = async (req, res) => {
 
     // Check if the user exists in the database by email
     const userExist = await pool.query({
-      text: "SELECT * FROM Identity.User WHERE email = $1 LIMIT 1",
+      text: `SELECT * FROM "Identity"."Users" WHERE "Email" = $1 LIMIT 1`,
       values: [email],
     });
 
     const user = userExist?.rows?.[0];
 
-    if (!user || user.firebaseUID !== firebaseUID) {
+    if (!user || user.FirebaseUID !== firebaseUID) {
       return res.status(401).json({
-        status: "failed",
+        status: "Failed",
         message: "Invalid email or firebaseUID.",
       });
     }
 
     // Generate JWT
     const token = createJWT(user.ID);  // Ensure `user.ID` is available from the query result.
+
+    user.FirebaseUID = undefined;
 
     res.status(200).json({
       status: "success",
