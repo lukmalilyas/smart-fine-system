@@ -7,7 +7,7 @@ export const signupUser = async (req, res) => {
     // Input validation using express-validator
     await body('firebaseUID').notEmpty().run(req);
     await body('email').isEmail().run(req);
-    await body('name').notEmpty().run(req);
+    await body('displayName').notEmpty().run(req);
     await body('provider').notEmpty().run(req);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -18,7 +18,7 @@ export const signupUser = async (req, res) => {
       });
     }
 
-    const { firebaseUID, email, name, provider } = req.body;
+    const { firebaseUID, email, displayName, provider } = req.body;
 
     const userExist = await pool.query({
       text: 'SELECT 1 FROM "Identity"."Users" WHERE "Email" = $1 LIMIT 1',
@@ -33,10 +33,10 @@ export const signupUser = async (req, res) => {
     }
 
     const user = await pool.query({
-      text: `INSERT INTO "Identity"."Users" ("FirebaseUID", "Email", "Name", "Provider") 
+      text: `INSERT INTO "Identity"."Users" ("FirebaseUID", "Email", "DisplayName", "Provider") 
              VALUES ($1, $2, $3, $4) 
-             RETURNING "Email", "Name", "Provider"`, // Make sure column names match
-      values: [firebaseUID, email, name, provider],
+             RETURNING "Email", "DisplayName", "Provider"`, // Make sure column names match
+      values: [firebaseUID, email, displayName, provider],
     });
     
 

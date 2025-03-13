@@ -7,7 +7,7 @@ CREATE TABLE "Identity"."Users" (
     "ID" UUID PRIMARY KEY DEFAULT gen_random_uuid(),  -- Unique internal user ID
     "FirebaseUID" VARCHAR(128) UNIQUE NOT NULL,      -- Unique Firebase Authentication ID
     "Email" VARCHAR(255) UNIQUE,                     -- User email (nullable for social logins)
-    "Name" VARCHAR(255),                             -- Full name from Firebase
+    "DisplayName" VARCHAR(255),                             -- Full name from Firebase
     "Provider" VARCHAR(50) NOT NULL,                 -- Auth provider (google, email, etc.)
     "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- User creation timestamp
     "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Last update timestamp
