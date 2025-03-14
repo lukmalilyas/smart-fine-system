@@ -5,6 +5,8 @@ import { setAuthToken } from "./libs/apiCall";
 import useStore from "./store";
 import SignupPage from "./pages/auth/sign-up";
 import SigninPage from "./pages/auth/sign-in";
+import GlassmorphNavbar from "./components/navbar";
+import { Register, Fines } from "./pages";
 
 const RootLayout = () => {
   const { user } = useStore((state) => state);
@@ -15,7 +17,7 @@ const RootLayout = () => {
     <Navigate to={"/sign-in"} replace={true} />
   ) : (
     <>
-      <Navbar />
+      <GlassmorphNavbar />
       <div className="min-h-[cal(h-screen-100px)]">
         <Outlet />
       </div>
@@ -30,6 +32,9 @@ const App = () => {
       <div className="w-full min-h-screen px-6 bg-gray-100 md:px-20 dark:bg-slate-900">
         <Routes>
           <Route element={<RootLayout />}>
+            <Route path="/" element={<Navigate to={"/register"} />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/fines" element={<Fines />} />
           </Route>
 
           <Route path="/sign-up" element={<SignupPage />} />
