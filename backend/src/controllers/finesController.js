@@ -4,7 +4,7 @@ export const getFines = async (req, res) => {
     try {
       const { licensePlate } = req.params;
       const fines = await pool.query({
-        text: `SELECT "LicensePlate", "FineAmount", "Location", "CreatedAt" FROM "Domain"."Fines" WHERE "LicensePlate" = $1`,
+        text: `SELECT "LicensePlate", "LongitudinalValue", "LatitudinalValue", "Speed", "CreatedAt" FROM "Domain"."Fines" WHERE "LicensePlate" = $1 AND "Speed" > 60`,
         values: [licensePlate],
       });
   

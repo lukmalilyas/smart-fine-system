@@ -35,7 +35,8 @@ CREATE TABLE "Domain"."Vehicles" (
 CREATE TABLE "Domain"."Fines" (
     "ID" SERIAL PRIMARY KEY,                                -- Unique ID (auto-incremented using SERIAL)
     "LicensePlate" VARCHAR(20) NOT NULL,                    -- License plate of the vehicle
-    "FineAmount" DECIMAL(10, 2) NOT NULL,                   -- Amount of the fine
-    "Location" VARCHAR(255) NOT NULL,                       -- Location where the fine was issued
-    "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP         -- Ticket creation timestamp
+    "LongitudinalValue" DECIMAL(9, 6) NOT NULL,             -- Longitude (as decimal with precision)
+    "LatitudinalValue" DECIMAL(9, 6) NOT NULL,              -- Latitude (as decimal with precision)
+    "Speed" DECIMAL(5, 2) NOT NULL,                         -- Speed (numeric value)
+    "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,        -- Ticket creation timestamp
 );

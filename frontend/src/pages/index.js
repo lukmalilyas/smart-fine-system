@@ -1,4 +1,4 @@
 import Register from "./register";
-import VehiclesMenu from "./fines";
+import VehiclesMenu from "./vehiclesmenu";
 
 export { Register, VehiclesMenu };
