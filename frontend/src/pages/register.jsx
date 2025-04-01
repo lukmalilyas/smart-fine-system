@@ -71,8 +71,21 @@ export default function Register() {
     resolver: zodResolver(RegisterSchema),
   });
 
-  const onSubmit = async (data) => {
-    console.log(data);
+  const onSubmit = async (vehicleData) => {
+    try {
+      setLoading(true);
+  
+      const { data: res } = await api.post(
+        "/vehicles/register",
+        vehicleData
+      );
+      console.log(res);
+    } catch (error) {
+      console.error("Something went wrong:", error);
+      toast.error(error?.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -6,7 +6,7 @@ import useStore from "./store";
 import SignupPage from "./pages/auth/sign-up";
 import SigninPage from "./pages/auth/sign-in";
 import GlassmorphNavbar from "./components/navbar";
-import { Register, Fines } from "./pages";
+import { Register, VehiclesMenu } from "./pages";
 
 const RootLayout = () => {
   const { user } = useStore((state) => state);
@@ -18,7 +18,7 @@ const RootLayout = () => {
   ) : (
     <>
       <GlassmorphNavbar />
-      <div className="min-h-[cal(h-screen-100px)]">
+      <div className="min-h-[calc(h-screen-100px)]">
         <Outlet />
       </div>
     </>
@@ -34,7 +34,7 @@ const App = () => {
           <Route element={<RootLayout />}>
             <Route path="/" element={<Navigate to={"/register"} />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/fines" element={<Fines />} />
+            <Route path="/vehiclesmenu" element={<VehiclesMenu />} />
           </Route>
 
           <Route path="/sign-up" element={<SignupPage />} />

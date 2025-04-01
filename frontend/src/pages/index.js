@@ -1,4 +1,4 @@
 import Register from "./register";
-import Fines from "./fines";
+import VehiclesMenu from "./fines";
 
-export { Register, Fines };
+export { Register, VehiclesMenu };
