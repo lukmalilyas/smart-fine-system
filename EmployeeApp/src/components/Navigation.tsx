@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Camera, LayoutDashboard, Mic } from 'lucide-react';
+import { Mic } from 'lucide-react';
 
 function Navigation() {
   const location = useLocation();

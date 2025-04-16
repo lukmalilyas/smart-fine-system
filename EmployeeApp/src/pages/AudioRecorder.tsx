@@ -207,8 +207,14 @@ function AudioRecorder() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       className="container mx-auto px-4 py-8"
-    >
-      <div className="max-w-md mx-auto">
+      
+    >{/* Welcome Text */}
+    <div className="text-center mt-6">
+      <h2 className="text-3xl font-bold text-white">🎙️ Welcome!</h2>
+      <p className="mt-2 text-zinc-400">Record and upload your audio files easily.</p>
+    </div>
+    
+      <div className="max-w-md mx-auto mt-10">
         <motion.div className="bg-zinc-900 rounded-3xl p-6 border border-zinc-800 relative">
           {/* Refresh Button */}
           <motion.button
