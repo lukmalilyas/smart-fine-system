@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Mic, StopCircle, Upload, AudioLines, FileAudio, RefreshCw } from 'lucide-react';
+import { Mic, Upload, AudioLines, RefreshCw } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
@@ -12,11 +12,9 @@ const s3 = new S3Client({
   }
 });
 
-
 function AudioRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [timer, setTimer] = useState(0);
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
@@ -28,14 +26,12 @@ function AudioRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
-  // Helper: Format seconds to mm:ss
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  // Start recording audio
   const handleStartRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -50,12 +46,10 @@ function AudioRecorder() {
       };
 
       mediaRecorder.onstop = () => {
-        // Build a blob from the recorded audio chunks
         const blob = new Blob(audioChunks.current, { type: 'audio/webm' });
         setAudioBlob(blob);
         const url = URL.createObjectURL(blob);
         setAudioURL(url);
-        setUploadedFileName(null);
         getLocation();
       };
 
@@ -72,7 +66,6 @@ function AudioRecorder() {
     }
   };
 
-  // Stop recording audio
   const handleStopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
@@ -84,28 +77,11 @@ function AudioRecorder() {
     }
   };
 
-  // Handle audio file selection from file input
-  const handleUploadAudio = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type.startsWith('audio/')) {
-      setAudioBlob(file);
-      const url = URL.createObjectURL(file);
-      setAudioURL(url);
-      setUploadedFileName(file.name);
-      getLocation();
-    } else {
-      alert('Please upload a valid audio file.');
-    }
-  };
-
-  // Clear selection after a successful upload
   const clearSelection = () => {
     setAudioURL(null);
-    setUploadedFileName(null);
     setAudioBlob(null);
   };
 
-  // Adapted upload function based on your video upload code snippet
   const handleUpload = async () => {
     if (!audioBlob || latitude === null || longitude === null) {
       alert('Missing audio or location data');
@@ -113,21 +89,14 @@ function AudioRecorder() {
     }
     setIsLoading(true);
 
-    // Create a location object using stored latitude & longitude
     const location = { latitude, longitude };
     const uniqueAudioTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    // File and folder names
-    const fileName = uploadedFileName || `audio_${uniqueAudioTimestamp}.webm`;
+    const fileName = `audio_${uniqueAudioTimestamp}.webm`;
     const folderPrefix = 'audios';
     const audioKey = `${folderPrefix}/audios/${uniqueAudioTimestamp}_${fileName}`;
     const metadataKey = `${folderPrefix}/metadata/${uniqueAudioTimestamp}_${fileName}.json`;
 
     try {
-      // Log file details
-      console.log('Uploading audio file:', audioBlob);
-      console.log('File type:', typeof audioBlob);
-
-      // Upload the audio file to S3
       const audioUploadCommand = new PutObjectCommand({
         Bucket: 'licence-pro-s3',
         Key: audioKey,
@@ -136,7 +105,6 @@ function AudioRecorder() {
       });
       await s3.send(audioUploadCommand);
 
-      // Prepare and upload metadata as JSON
       const metadata = JSON.stringify({
         latitude: location.latitude,
         longitude: location.longitude,
@@ -161,11 +129,9 @@ function AudioRecorder() {
     }
   };
 
-  // Reset the component state
   const handleRefresh = () => {
     setIsRecording(false);
     setAudioURL(null);
-    setUploadedFileName(null);
     setTimer(0);
     setLatitude(null);
     setLongitude(null);
@@ -176,7 +142,6 @@ function AudioRecorder() {
     }
   };
 
-  // Get current geolocation
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -194,12 +159,29 @@ function AudioRecorder() {
     }
   };
 
-  // Cleanup on component unmount
+  // 🔑 Spacebar event handlers
   useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !isRecording) {
+        e.preventDefault();
+        handleStartRecording();
+      }
     };
-  }, []);
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && isRecording) {
+        e.preventDefault();
+        handleStopRecording();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [isRecording]);
 
   return (
     <motion.div
@@ -207,16 +189,14 @@ function AudioRecorder() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       className="container mx-auto px-4 py-8"
-      
-    >{/* Welcome Text */}
-    <div className="text-center mt-6">
-      <h2 className="text-3xl font-bold text-white">🎙️ Welcome!</h2>
-      <p className="mt-2 text-zinc-400">Record and upload your audio files easily.</p>
-    </div>
-    
+    >
+      <div className="text-center mt-6">
+        <h2 className="text-3xl font-bold text-white">🎙️ Welcome!</h2>
+        <p className="mt-2 text-zinc-400">Record & Confirm your command</p>
+      </div>
+
       <div className="max-w-md mx-auto mt-10">
         <motion.div className="bg-zinc-900 rounded-3xl p-6 border border-zinc-800 relative">
-          {/* Refresh Button */}
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleRefresh}
@@ -225,7 +205,6 @@ function AudioRecorder() {
             <RefreshCw size={20} color="white" />
           </motion.button>
 
-          {/* Heading */}
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -241,63 +220,30 @@ function AudioRecorder() {
               transition={{ delay: 0.3 }}
               className="text-2xl font-bold"
             >
-              Audio Recorder
+              Push to Talk
             </motion.h1>
-            <motion.p
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-zinc-400"
-            >
-              Upload or record audio
-            </motion.p>
           </div>
 
-          {/* File Upload Area */}
-          <div className="mb-6">
-            <div className="relative border border-zinc-700 rounded-2xl p-4 bg-zinc-800 text-center cursor-pointer hover:border-blue-500 transition-colors">
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={handleUploadAudio}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-              <div className="flex flex-col items-center">
-                <FileAudio size={24} />
-                <span className="mt-2 text-zinc-400 text-sm">
-                  {uploadedFileName ? `Selected: ${uploadedFileName}` : 'Click to choose a file'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Recording and Upload Controls */}
+          {/* Push to Talk Button */}
           <div className="space-y-4">
-            {!isRecording && (
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={handleStartRecording}
-                className="w-full flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 transition-colors text-white font-medium py-4 rounded-2xl"
-              >
-                <Mic size={20} />
-                <span>Start Recording</span>
-              </motion.button>
-            )}
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onMouseDown={handleStartRecording}
+              onMouseUp={handleStopRecording}
+              onTouchStart={handleStartRecording}
+              onTouchEnd={handleStopRecording}
+              className={`w-full flex items-center justify-center space-x-2 ${
+                isRecording ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+              } transition-colors text-white font-medium py-4 rounded-2xl`}
+            >
+              <Mic size={20} />
+              <span>{isRecording ? 'Recording... Release to Stop' : 'Hold to Talk'}</span>
+            </motion.button>
 
             {isRecording && (
-              <>
-                <div className="text-center text-sm text-zinc-400">
-                  Recording Time: <span className="font-mono text-white">{formatTime(timer)}</span>
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleStopRecording}
-                  className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 transition-colors text-white font-medium py-4 rounded-2xl"
-                >
-                  <StopCircle size={20} />
-                  <span>Stop Recording</span>
-                </motion.button>
-              </>
+              <div className="text-center text-sm text-zinc-400">
+                Recording Time: <span className="font-mono text-white">{formatTime(timer)}</span>
+              </div>
             )}
 
             {audioURL && (
@@ -309,13 +255,12 @@ function AudioRecorder() {
                   className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 transition-colors text-white font-medium py-4 rounded-2xl"
                 >
                   <Upload size={20} />
-                  <span>{isLoading ? 'Uploading...' : 'Upload Audio'}</span>
+                  <span>{isLoading ? 'Uploading...' : 'Confirm Command'}</span>
                 </motion.button>
               </>
             )}
           </div>
 
-          {/* Location Display */}
           {latitude && longitude && (
             <div className="mt-6 text-center text-zinc-400">
               <p>Location:</p>
@@ -339,7 +284,7 @@ function AudioRecorder() {
                 exit={{ scale: 0.9, opacity: 0 }}
                 className="p-6 rounded-lg shadow-lg w-[90%] max-w-sm mx-4 bg-black text-white"
               >
-                <h2 className="text-lg font-semibold mb-4">Successfull</h2>
+                <h2 className="text-lg font-semibold mb-4">Successful</h2>
                 <p className="mb-6">File Uploaded Successfully</p>
                 <div className="flex justify-end gap-4">
                   <button
@@ -358,4 +303,4 @@ function AudioRecorder() {
   );
 }
 
-export default AudioRecorder;
+export default AudioRecorder;
