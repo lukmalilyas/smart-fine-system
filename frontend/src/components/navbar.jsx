@@ -12,8 +12,8 @@ export const navigationItems = [
     items: [],
   },
   {
-    title: "Vehicles Menu",
-    href: "/vehiclesmenu",
+    title: "Restaurant List",
+    href: "/restaurantList",
     items: [],
   },
   {

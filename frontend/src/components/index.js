@@ -1,5 +1,5 @@
-import ViewFines from "./modals/view-fines.jsx";
+import ViewSurveillance from "./modals/view-surveillance.jsx";
 
 export {
-  ViewFines
+  ViewSurveillance
 };

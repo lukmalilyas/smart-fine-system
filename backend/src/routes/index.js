@@ -1,12 +1,12 @@
 import express from 'express';
 import authRoutes from "./authRoutes.js";
-import vehicles from "./vehicles.js";
-import fines from "./fines.js";
+import restaurant from "./restaurent.js";
+import surveillance from "./surveillance.js";
 
 const routes = express.Router();
 
 routes.use("/auth", authRoutes);
-routes.use("/vehicles", vehicles);
-routes.use("/fines", fines);
+routes.use("/restaurant", restaurant);
+routes.use("/surveillance", surveillance);
 
 export default routes;

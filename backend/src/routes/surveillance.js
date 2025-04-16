@@ -1,9 +1,9 @@
 import express from "express";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { getFines } from '../controllers/finesController.js';
+import { getSurveillance } from '../controllers/surveillanceController.js';
 
 const router = express.Router();
 
-router.get("/:licensePlate", authMiddleware, getFines);
+router.get("/:licenseNumber", getSurveillance);
 
 export default router;

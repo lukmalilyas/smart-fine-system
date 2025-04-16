@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/table";
 import api from "../libs/apiCall"; // Ensure the correct path to your api.js file
 import {
-  ViewFines
+  ViewSurveillance
 } from "../components";
 
 // Column definitions
@@ -47,39 +47,29 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "LicensePlate",
+    accessorKey: "LicenseNumber",
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-        License Plate
+        License Number
         <ArrowUpDown />
       </Button>
     ),
-    cell: ({ row }) => <div className="capitalize">{row.getValue("LicensePlate")}</div>
+    cell: ({ row }) => <div>{row.getValue("LicenseNumber")}</div>
   },
   {
-    accessorKey: "VehicleType",
-    header: "Vehicle Type",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("VehicleType")}</div>
+    accessorKey: "RestaurantName",
+    header: "Restaurant Name",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("RestaurantName")}</div>
   },
   {
-    accessorKey: "VehicleModel",
-    header: "Vehicle Model",
-    cell: ({ row }) => <div>{row.getValue("VehicleModel")}</div>
-  },
-  {
-    accessorKey: "VehicleColour",
-    header: "Vehicle Colour",
-    cell: ({ row }) => <div>{row.getValue("VehicleColour")}</div>
-  },
-  {
-    accessorKey: "FirstName",
+    accessorKey: "OwnerFirstName",
     header: "Owner First Name",
-    cell: ({ row }) => <div>{row.getValue("FirstName")}</div>
+    cell: ({ row }) => <div>{row.getValue("OwnerFirstName")}</div>
   },
   {
-    accessorKey: "LastName",
+    accessorKey: "OwnerLastName",
     header: "Owner Last Name",
-    cell: ({ row }) => <div>{row.getValue("LastName")}</div>
+    cell: ({ row }) => <div>{row.getValue("OwnerLastName")}</div>
   },
   {
     accessorKey: "PhoneNumber",
@@ -102,18 +92,23 @@ export const columns = [
     cell: ({ row }) => <div>{row.getValue("NIC")}</div>
   },
   {
-    accessorKey: "ChassisNumber",
-    header: "Chassis Number",
-    cell: ({ row }) => <div>{row.getValue("ChassisNumber")}</div>
+    accessorKey: "RegistrationNumber",
+    header: "Registration Number",
+    cell: ({ row }) => <div>{row.getValue("RegistrationNumber")}</div>
   },
   {
-    accessorKey: "EngineNumber",
-    header: "Engine Number",
-    cell: ({ row }) => <div>{row.getValue("EngineNumber")}</div>
+    accessorKey: "LastUpdated",
+    header: "Last Updated",
+    cell: ({ row }) => <div>{new Date(row.getValue("LastUpdated")).toLocaleString()}</div>
+  },
+  {
+    accessorKey: "RegistrationDate",
+    header: "Registration Date",
+    cell: ({ row }) => <div>{new Date(row.getValue("RegistrationDate")).toLocaleString()}</div>
   }
 ];
 
-export default function VehiclesMenu() {
+export default function RestaurantList() {
   const [data, setData] = useState([]);
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -139,19 +134,19 @@ export default function VehiclesMenu() {
 
   // Fetch vehicle data
   useEffect(() => {
-    const getVehicles = async () => {
+    const getRestaurants = async () => {
       try {
-        const { data: res } = await api.get("/vehicles/");
+        const { data: res } = await api.get("/restaurant/");  // Updated API endpoint based on data structure
         console.log(res.data);
         setData(res.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error retrieving vehicle:", error);
+        console.error("Error retrieving vehicles:", error);
         setLoading(false);
       }
     };
 
-    getVehicles();
+    getRestaurants();
   }, []);
 
   const handleRowClick = (row) => {
@@ -187,9 +182,9 @@ export default function VehiclesMenu() {
       <div className="w-full mt-30 bg-white p-6 rounded-lg shadow-lg">
         <div className="flex items-center py-4">
           <Input
-            placeholder="Filter license plates..."
-            value={table.getColumn("LicensePlate")?.getFilterValue() || ""}
-            onChange={(event) => table.getColumn("LicensePlate")?.setFilterValue(event.target.value)}
+            placeholder="Filter license numbers..."
+            value={table.getColumn("LicenseNumber")?.getFilterValue() || ""}
+            onChange={(event) => table.getColumn("LicenseNumber")?.setFilterValue(event.target.value)}
             className="max-w-sm"
           />
           <DropdownMenu>
@@ -253,7 +248,7 @@ export default function VehiclesMenu() {
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="space-x-2">
             <Button variant="outline" size="sm" onClick={handleCheckFines}>
-              Check fines
+              Check Surveillence
             </Button>
             <Button
               variant="outline"
@@ -276,15 +271,12 @@ export default function VehiclesMenu() {
       </div>
 
       {/* Modal for displaying row details */}
-
-    <ViewFines
-    isOpen={isModalOpen}
-    setIsOpen={setIsModalOpen}
-    selectedRow={selectedRow}
-    key={new Date().getTime()}
-    />
-    
+      <ViewSurveillance
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        selectedRow={selectedRow}
+        key={new Date().getTime()}
+      />
     </div>
-
   );
 }

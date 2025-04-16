@@ -11,4 +11,7 @@ export const pool = new Pool({
   database: process.env.DATABASE_NAME,     // Database name
   password: process.env.DATABASE_PASSWORD, // Database password
   port: parseInt(process.env.DATABASE_PORT, 10), // Database port (converted to a number)
+  ssl: {
+    rejectUnauthorized: false
+  } 
 });
