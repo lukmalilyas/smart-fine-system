@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Mic, Upload, AudioLines, RefreshCw } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
@@ -192,7 +192,7 @@ function AudioRecorder() {
     >
       <div className="text-center mt-6">
         <h2 className="text-3xl font-bold text-white">🎙️ Welcome to SmartShield!</h2>
-        <p className="mt-2 text-zinc-400">Record & Confirm your command</p>
+        <p className="mt-2 text-zinc-400">Your Smart Security Assisstant</p>
       </div>
 
       <div className="max-w-md mx-auto mt-10">
@@ -218,10 +218,12 @@ function AudioRecorder() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-2xl font-bold"
+              className="text-3xl font-bold mb-2"
             >
               Push to Talk
             </motion.h1>
+            <p className="text-zinc-400">Press & Hold the Button to Record</p>
+
           </div>
 
           {/* Push to Talk Button */}
@@ -250,24 +252,63 @@ function AudioRecorder() {
               <>
                 <audio controls src={audioURL} className="w-full mt-4 rounded-lg" />
                 <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleUpload}
-                  className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 transition-colors text-white font-medium py-4 rounded-2xl"
-                >
-                  <Upload size={20} />
-                  <span>{isLoading ? 'Uploading...' : 'Confirm Command'}</span>
-                </motion.button>
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    disabled={isLoading}
+                    onClick={handleUpload}
+                    className={`w-full flex items-center justify-center space-x-2 transition-colors text-white font-medium py-4 rounded-2xl ${
+                      isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8H4z"
+                          />
+                        </svg>
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={20} />
+                        <span>Confirm Command</span>
+                      </>
+                    )}
+                  </motion.button>
               </>
             )}
           </div>
 
           {latitude && longitude && (
-            <div className="mt-6 text-center text-zinc-400">
-              <p>Location:</p>
-              <p>Latitude: {latitude.toFixed(4)}</p>
-              <p>Longitude: {longitude.toFixed(4)}</p>
+          <div className="mt-6">
+            <div className="bg-zinc-800 p-4 rounded-2xl border border-zinc-700 shadow-sm text-center">
+              <div className="flex flex-col items-center justify-center space-y-2 mb-2 text-zinc-300">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.05 3.636a8 8 0 0111.314 11.314l-5.657 5.657a1 1 0 01-1.414 0L5.05 14.95a8 8 0 010-11.314zM10 11a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                </svg>
+                <span className="text-sm font-medium">Location Detected</span>
+              </div>
+              <div className="text-sm text-zinc-200 font-mono">
+                <p>Latitude: {latitude.toFixed(4)}</p>
+                <p>Longitude: {longitude.toFixed(4)}</p>
+              </div>
             </div>
-          )}
+          </div>
+        )}
+
+
         </motion.div>
 
         <AnimatePresence>
@@ -285,13 +326,13 @@ function AudioRecorder() {
                 className="p-6 rounded-lg shadow-lg w-[90%] max-w-sm mx-4 bg-black text-white"
               >
                 <h2 className="text-lg font-semibold mb-4">Successful</h2>
-                <p className="mb-6">Command Processed Successfully</p>
+                <p className="mb-6">Command Sent Successfully</p>
                 <div className="flex justify-end gap-4">
                   <button
                     onClick={() => setShowOkbutton(false)}
                     className="px-4 py-2 rounded-lg transition-colors bg-green-500 hover:bg-green-500/80"
                   >
-                    Ok
+                    Okay
                   </button>
                 </div>
               </motion.div>
