@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Mic } from 'lucide-react';
+import { Home } from 'lucide-react'; // Use Home icon instead of Mic
 
 function Navigation() {
   const location = useLocation();
@@ -16,7 +16,7 @@ function Navigation() {
               location.pathname === '/record-audio' ? 'text-white' : 'text-zinc-500'
             }`}
           >
-            <Mic size={24} />
+            <Home size={24} />
             <span className="text-xs mt-1">Home</span>
           </button>
         </div>

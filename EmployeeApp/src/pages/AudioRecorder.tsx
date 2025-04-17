@@ -191,7 +191,7 @@ function AudioRecorder() {
       className="container mx-auto px-4 py-8"
     >
       <div className="text-center mt-6">
-        <h2 className="text-3xl font-bold text-white">🎙️ Welcome!</h2>
+        <h2 className="text-3xl font-bold text-white">🎙️ Welcome to SmartShield!</h2>
         <p className="mt-2 text-zinc-400">Record & Confirm your command</p>
       </div>
 
@@ -285,7 +285,7 @@ function AudioRecorder() {
                 className="p-6 rounded-lg shadow-lg w-[90%] max-w-sm mx-4 bg-black text-white"
               >
                 <h2 className="text-lg font-semibold mb-4">Successful</h2>
-                <p className="mb-6">File Uploaded Successfully</p>
+                <p className="mb-6">Command Processed Successfully</p>
                 <div className="flex justify-end gap-4">
                   <button
                     onClick={() => setShowOkbutton(false)}
