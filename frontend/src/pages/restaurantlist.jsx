@@ -31,6 +31,8 @@ import api from "../libs/apiCall"; // Ensure the correct path to your api.js fil
 import {
   ViewSurveillance
 } from "../components";
+import axios from 'axios';
+import { toast } from "sonner";
 
 // Column definitions
 export const columns = [
@@ -168,6 +170,22 @@ export default function RestaurantList() {
     }
   };
 
+  const handleStartSurveillence = () => {
+    axios.post('http://localhost:8000/start-tracking', '', {
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log('Success:', response.data);
+      toast.success("Tracking started successfully!");
+    })
+    .catch(error => {
+      console.error('Error:', response?.data);
+      toast.error(error?.response?.data?.message || error.message);
+    });
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedRow(null);
@@ -247,6 +265,9 @@ export default function RestaurantList() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="space-x-2">
+            <Button variant="outline" size="sm" onClick={handleStartSurveillence}>
+              `Start`Surveillence and device management
+            </Button>
             <Button variant="outline" size="sm" onClick={handleCheckFines}>
               Check Surveillence
             </Button>
