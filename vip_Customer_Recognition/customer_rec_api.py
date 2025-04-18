@@ -24,12 +24,12 @@ for name in os.listdir(KNOWN_FACES_DIR):
         continue
 
     for filename in os.listdir(person_folder):
-        file_path = os.path.join(person_folder, filename)
-        image = face_recognition.load_image_file(file_path)
-        encodings = face_recognition.face_encodings(image)
-        if encodings:
-            known_faces.append(encodings[0])
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            image = face_recognition.load_image_file(os.path.join(person_folder, filename))
+            encoding = face_recognition.face_encodings(image)[0]
+            known_faces.append(encoding)
             known_names.append(name)
+            
 
 @app.post("/identify/")
 async def identify_face(file: UploadFile = File(...)):
