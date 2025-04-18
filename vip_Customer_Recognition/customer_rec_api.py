@@ -12,7 +12,7 @@ app = FastAPI()
 
 # Load known faces
 KNOWN_FACES_DIR = 'known_customers'
-TOLERANCE = 0.6
+TOLERANCE = 0.5
 MODEL = 'hog'
 
 known_faces = []
