@@ -25,14 +25,6 @@ for name in os.listdir(KNOWN_FACES_DIR):
 
     for filename in os.listdir(person_folder):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-            image = face_recognition.load_image_file(os.path.join(person_folder, filename))
-            for name in os.listdir(KNOWN_FACES_DIR):
-    person_folder = os.path.join(KNOWN_FACES_DIR, name)
-    if not os.path.isdir(person_folder):
-        continue
-
-    for filename in os.listdir(person_folder):
-        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
             image_path = os.path.join(person_folder, filename)
             image = face_recognition.load_image_file(image_path)
             encodings = face_recognition.face_encodings(image)
@@ -43,6 +35,7 @@ for name in os.listdir(KNOWN_FACES_DIR):
             else:
                 print(f"[WARNING] No face found in {filename} for {name} — skipping.")
 
+                
 @app.post("/identify/")
 async def identify_face(file: UploadFile = File(...)):
     contents = await file.read()
