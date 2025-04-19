@@ -35,7 +35,7 @@ for name in os.listdir(KNOWN_FACES_DIR):
             else:
                 print(f"[WARNING] No face found in {filename} for {name} — skipping.")
 
-                
+
 @app.post("/identify/")
 async def identify_face(file: UploadFile = File(...)):
     contents = await file.read()
@@ -71,4 +71,4 @@ async def identify_face(file: UploadFile = File(...)):
     return {"matches": matches}
 
 if __name__ == "__main__":
-    uvicorn.run("face_recognition_api:app", host="0.0.0.0", port=8000)
+    uvicorn.run("customer_rec_api:app", host="0.0.0.0", port=8000)
