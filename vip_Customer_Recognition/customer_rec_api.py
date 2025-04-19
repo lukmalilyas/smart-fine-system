@@ -81,4 +81,4 @@ async def identify_face(file: UploadFile = File(...)):
 
 # 🧠 Fix main condition typo
 if __name__ == "__main__":
-    uvicorn.run("customer_rec_api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("customer_rec_api:app", host="0.0.0.0", port=8000, reload=False)
